@@ -70,13 +70,27 @@ Then
 #####EMR
 ######Demo:Running streaming mapreduce
 ```
+wget hadoop-streaming.jar http://central.maven.org/maven2/org/apache/hadoop/hadoop-streaming/2.6.0/hadoop-streaming-2.6.0.jar
 mkdir streamingCode
-wget -O ./stramingCode/wordSplitter.py http://s3.amazonaws.com/elssticmapreduce/samples/wordcount/sordSplitter.py
-hadoop jar contrib/streaming/hadoop-streaming.jar -files streamingCode/wordSplitter.py -mapper wordSplitter.py input s3://elasticmapreduce/samples/wordcount/input -output streamingCode/wordCount -reducer aggregate
+wget -O ./streamingCode/wordSplitter.py http://s3.amazonaws.com/elasticmapreduce/samples/wordcount/wordSplitter.py
+hadoop jar hadoop-streaming.jar -files streamingCode/wordSplitter.py -mapper wordSplitter.py -input s3://elasticmapreduce/samples/wordcount/input -output streamingCode/wordCountOut -reducer aggregate
 ```
+//I still dont know how to use local path
 ```
-hadoop fs -rm stramingCode/wordCountOut/*
-hadoop fs -rmdir stramingCode/wordCountOut
+hadoop fs -cat hdfs://ip-172.ec2.internal:8020/user/root/streamingCodeOut/*
+hadoop fs -rm hdfs://ip-172.ec2.internal:8020/user/root/streamingCodeOut/*
+hadoop fs -rmdir hdfs://ip-172.ec2.internal:8020/user/root/streamingCodeOut/*
 rm streamingCode/*
 rmdir streamingCode
+```
+#####Redshift
+```
+CREATE table data(...)
+COPY data FROM 'dynamodb://xx' WITH CREDENTIALS AS 'aws_access_key_id=...;aws_secret_access_key= ' READRATIO 50
+```
+
+#####Data plpeline
+######Troubleshooting the pipeline
+```
+select * from stl_load_errors order by starttime desc;
 ```
